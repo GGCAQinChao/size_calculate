@@ -13,8 +13,9 @@ def calculation_in_one(input_path,output_path,img_select,transfer_flag,threshold
     file_list = glob.glob(input_path+'/*')
     img_gray = {'RGB2GRAY':0,'R通道':1,'G通道':2,'B通道':3}
     for input_file in file_list:
-        print(input_file)
+        #print(input_file)
         ori_image = cv2.imread(input_file)
+        st.image(ori_image)
         #拆分RGB三通道，生产灰度图
         gray_list = {}
         gray_list[0] = cv2.cvtColor(ori_image,cv2.COLOR_BGR2GRAY)
