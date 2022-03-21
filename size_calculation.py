@@ -11,6 +11,7 @@ import glob
 
 def calculation_in_one(input_path,output_path,img_select,transfer_flag,threshold_select,remove_select,size_select,show_select,rgb_color,line_select,font_select,fonl_select,output_flag):
     file_list = glob.glob(input_path+'/*')
+    print(file_list)
     img_gray = {'RGB2GRAY':0,'R通道':1,'G通道':2,'B通道':3}
     for input_file in file_list:
         st.write(input_file)
