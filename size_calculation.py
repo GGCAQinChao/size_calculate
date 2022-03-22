@@ -243,6 +243,7 @@ def multi_image_process():
     if st.button('Run'):
         image_output,size_output = calculation_in_one(upload_list,img_select,transfer_flag,threshold_select,remove_select,size_select,show_select,rgb_color,line_select,font_select,fonl_select,output_flag)
         st.download_button(label="Download data as CSV",data=pd.DataFrame(size_output,columns=['ID','Size']).to_csv().encode('utf-8'),mime='text/csv')
+        st.write('下载计算结果文件时，Streamlit会自动刷新界面导致圈画的图像消失，这个时候再点一下Run就行了，就……离谱……（老人地铁手机.jpg）')
         st.header('结果展示')
         for image_detail in image_output:
             st.subheader(image_detail[0]+' 圈画结果')
