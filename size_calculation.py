@@ -264,10 +264,10 @@ def multi_image_process():
 
 def main():
     st.sidebar.header('模块选择')
-    tool_select = st.sidebar.selectbox('Tools to select:',['面积计算','多图像处理'])
+    tool_select = st.sidebar.selectbox('Tools to select:',['面积计算','多图像面积计算'])
     if tool_select == '面积计算':
         size_calculation()
-    elif tool_select == '多图像处理':
+    elif tool_select == '多图像面积计算':
         multi_image_process()
 
 if __name__ == '__main__':
