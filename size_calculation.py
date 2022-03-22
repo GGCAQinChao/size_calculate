@@ -206,7 +206,7 @@ def size_calculation():
 
 def multi_image_process():
     st.title('多样本面积圈画和大小计算')
-    st.header('路径信息收集')
+    st.header('多图像输入')
     upload_list = st.file_uploader('Choose files',accept_multiple_files=True)
     st.header('图像转换和二值化')
     col1,col2 = st.columns(2)
