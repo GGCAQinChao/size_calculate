@@ -1,4 +1,5 @@
 # coding: utf-8
+# 在线工具网站地址：https://share.streamlit.io/ggcaqinchao/size_calculate/main/size_calculation.py
 import re
 import cv2
 import streamlit as st
@@ -7,63 +8,56 @@ import pandas as pd
 import numpy as np
 import os
 from PIL import Image
-import glob
+import zipfile
 
-def calculation_in_one(input_path,output_path,img_select,transfer_flag,threshold_select,remove_select,size_select,show_select,rgb_color,line_select,font_select,fonl_select,output_flag):
-    file_list = glob.glob(input_path+'/*')
-    print(file_list)
+def calculation_in_one(upload_list,img_select,transfer_flag,threshold_select,remove_select,size_select,show_select,rgb_color,line_select,font_select,fonl_select,output_flag):
     img_gray = {'RGB2GRAY':0,'R通道':1,'G通道':2,'B通道':3}
-    for input_file in file_list:
-        st.write(input_file)
-        #print(input_file)
-        ori_image = cv2.imread(input_file)
-        st.image(ori_image)
-        #拆分RGB三通道，生产灰度图
-        gray_list = {}
-        gray_list[0] = cv2.cvtColor(ori_image,cv2.COLOR_BGR2GRAY)
-        gray_list[1],gray_list[2],gray_list[3]=cv2.split(ori_image)
-        #反转灰度图并二值化
-        img_use = gray_list[img_gray[img_select]]
-        if transfer_flag:
-            img_use = 255 - img_use
-        if threshold_select == 'auto':
-            thresh, binary_img = cv2.threshold(img_use,0,255,cv2.THRESH_BINARY+cv2.THRESH_OTSU)
-        else:
-            thresh, binary_img = cv2.threshold(img_use,threshold_select,255,cv2.THRESH_BINARY)
-        #去噪
-        element = cv2.getStructuringElement(cv2.MORPH_CROSS,(remove_select,remove_select))
-        dst_img=cv2.morphologyEx(binary_img,cv2.MORPH_OPEN,element)
-        #检测轮廓
-        contours, hierarchy = cv2.findContours(dst_img, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-        cv2.drawContours(dst_img, contours, -1,(120,0,0),2)
+    if upload_list is not []:
         size_output = []
-        count=0
-        ares_avrg=0
-        for cont in contours:
-            ares = cv2.contourArea(cont)
-            if ares < size_select:
-                continue
-            count += 1
-            ares_avrg += ares
-            #提取水平矩形坐标
-            rect = cv2.boundingRect(cont)
-            size_output.append('id-'+str(count)+','+str(float(ares)))
-            #矩形绘制
-            if show_select == '边框':
-                cv2.rectangle(ori_image,rect,rgb_color,line_select)
+        image_output = []
+        for upload_file in upload_list:
+            size_output.append([upload_file.name,'-'])
+            bytes_data = upload_file.getvalue()
+            ori_image = cv2.imdecode(np.frombuffer(bytes_data, np.uint8), cv2.IMREAD_COLOR)
+            #拆分RGB三通道，生产灰度图
+            gray_list = {}
+            gray_list[0] = cv2.cvtColor(ori_image,cv2.COLOR_BGR2GRAY)
+            gray_list[1],gray_list[2],gray_list[3]=cv2.split(ori_image)
+            #反转灰度图并二值化
+            img_use = gray_list[img_gray[img_select]]
+            if transfer_flag:
+                img_use = 255 - img_use
+            if threshold_select == 'auto':
+                thresh, binary_img = cv2.threshold(img_use,0,255,cv2.THRESH_BINARY+cv2.THRESH_OTSU)
             else:
-                cv2.drawContours(ori_image,cont, -1,rgb_color,line_select)
-            y=10 if rect[1] < 10 else rect[1]
-            #给愈伤编号
-            cv2.putText(ori_image,str(count),(rect[0],y),cv2.FONT_HERSHEY_COMPLEX,font_select,rgb_color,fonl_select)
-        if output_flag:
-            cv2.imwrite(input_file.replace(input_path,output_path)[:-4]+'.gray.jpg',img_use)
-            cv2.imwrite(input_file.replace(input_path,output_path)[:-4]+'.binary.jpg',binary_img)
-            cv2.imwrite(input_file.replace(input_path,output_path)[:-4]+'.contour.jpg',dst_img)
-        cv2.imwrite(input_file.replace(input_path,output_path)[:-4]+'.rectangle.jpg',ori_image)
-        with open(input_file.replace(input_path,output_path)[:-4]+'.csv','w') as w:
-            w.write('#ID,Size\n'+'\n'.join(size_output))
-    return img_use,binary_img,dst_img,ori_image
+                thresh, binary_img = cv2.threshold(img_use,threshold_select,255,cv2.THRESH_BINARY)
+            #去噪
+            element = cv2.getStructuringElement(cv2.MORPH_CROSS,(remove_select,remove_select))
+            dst_img=cv2.morphologyEx(binary_img,cv2.MORPH_OPEN,element)
+            #检测轮廓
+            contours, hierarchy = cv2.findContours(dst_img, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+            cv2.drawContours(dst_img, contours, -1,(120,0,0),2)
+            count=0
+            ares_avrg=0
+            for cont in contours:
+                ares = cv2.contourArea(cont)
+                if ares < size_select:
+                    continue
+                count += 1
+                ares_avrg += ares
+                #提取水平矩形坐标
+                rect = cv2.boundingRect(cont)
+                size_output.append(['id-'+str(count),float(ares)])
+                #矩形绘制
+                if show_select == '边框':
+                    cv2.rectangle(ori_image,rect,rgb_color,line_select)
+                else:
+                    cv2.drawContours(ori_image,cont, -1,rgb_color,line_select)
+                y=10 if rect[1] < 10 else rect[1]
+                #给愈伤编号
+                cv2.putText(ori_image,str(count),(rect[0],y),cv2.FONT_HERSHEY_COMPLEX,font_select,rgb_color,fonl_select)
+            image_output.append([upload_file.name,img_use,binary_img,dst_img,ori_image])
+    return image_output,size_output
 
 def upload_and_show():
     st.write('图片读取后，由于不同的解码方式，可能会存在一定的色差，但是并不影响后续的计算操作，请放心使用。')
@@ -213,8 +207,7 @@ def size_calculation():
 def multi_image_process():
     st.title('多样本面积圈画和大小计算')
     st.header('路径信息收集')
-    input_path = st.text_input('输入文件路径(分隔符请用/)：','NA')
-    output_path = st.text_input('输出文件夹路径(分隔符请用/)：','NA')
+    upload_list = st.file_uploader('Choose files',accept_multiple_files=True)
     st.header('图像转换和二值化')
     col1,col2 = st.columns(2)
     with col1:
@@ -246,22 +239,27 @@ def multi_image_process():
         fonl_select = int(st.text_input('编号字体的粗细(int)：','1'))
     st.header('运行批量计算')
     output_flag = st.checkbox('是否输出所有过程图像？')
-    if st.button('RUN'):
-        img_use,binary_img,dst_img,ori_image = calculation_in_one(input_path,output_path,img_select,transfer_flag,threshold_select,remove_select,size_select,show_select,rgb_color,line_select,font_select,fonl_select,output_flag)
-        st.subheader('部分结果展示')
-        col1,col2 = st.columns(2)
-        with col1:
-            st.subheader('灰度图')
-            st.image(img_use)
-        with col2:
-            st.subheader('二值化')
-            st.image(binary_img)
-        with col1:
-            st.subheader('样本轮廓')
-            st.image(dst_img)
-        with col2:
-            st.subheader('样本圈画')
-            st.image(ori_image)
+    size_output = []
+    if st.button('Run'):
+        image_output,size_output = calculation_in_one(upload_list,img_select,transfer_flag,threshold_select,remove_select,size_select,show_select,rgb_color,line_select,font_select,fonl_select,output_flag)
+        st.download_button(label="Download data as CSV",data=pd.DataFrame(size_output,columns=['ID','Size']).to_csv().encode('utf-8'),mime='text/csv')
+        st.header('结果展示')
+        for image_detail in image_output:
+            st.subheader(image_detail[0]+' 圈画结果')
+            col1,col2 = st.columns(2)
+            if output_flag:
+                with col1:
+                    st.write('灰度图')
+                    st.image(image_detail[1])
+                with col2:
+                    st.write('二值化')
+                    st.image(image_detail[2])
+            with col1:
+                st.write('样本轮廓')
+                st.image(image_detail[3])
+            with col2:
+                st.write('样本圈画')
+                st.image(image_detail[4])
 
 def main():
     st.sidebar.header('模块选择')
