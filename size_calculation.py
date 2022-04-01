@@ -264,6 +264,7 @@ def multi_image_process():
 
 def pick_skeleton():
     st.header('原始图像读取')
+    st.write('暂时无法处理过大的图像信息，有待优化。')
     ori_image = upload_and_show()
     if ori_image == 'NA':
         st.write('No image.')
