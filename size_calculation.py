@@ -8,7 +8,7 @@ import pandas as pd
 import numpy as np
 import os
 from PIL import Image
-import zipfile
+from skimage import morphology
 
 def calculation_in_one(upload_list,img_select,transfer_flag,threshold_select,remove_select,size_select,show_select,rgb_color,line_select,font_select,fonl_select,output_flag):
     img_gray = {'RGB2GRAY':0,'R通道':1,'G通道':2,'B通道':3}
