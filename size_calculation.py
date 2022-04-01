@@ -302,7 +302,7 @@ def pick_skeleton():
             skeleton_sum = cv2.morphologyEx(skeleton_sum,cv2.MORPH_OPEN,element)
             st.subheader('骨架图合并')
             st.image(skeleton_sum,output_format='PNG')
-                
+
 def main():
     st.sidebar.header('模块选择')
     tool_select = st.sidebar.selectbox('Tools to select:',['单一图像面积计算','多图像批量面积计算','细胞骨架提取'])
@@ -312,7 +312,6 @@ def main():
         multi_image_process()
     elif tool_select == '细胞骨架提取':
         pick_skeleton()
-
 
 if __name__ == '__main__':
     main()
