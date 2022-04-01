@@ -310,8 +310,8 @@ def main():
         size_calculation()
     elif tool_select == '多图像批量面积计算':
         multi_image_process()
-    elif tool_select == '细胞骨架提取':
-        pick_skeleton()
+    #elif tool_select == '细胞骨架提取':
+    #   pick_skeleton()
 
 if __name__ == '__main__':
     main()
