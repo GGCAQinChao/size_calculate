@@ -55,3 +55,7 @@ def main():
     tool_select = st.sidebar.selectbox('Tools to select:',['细胞骨架提取'])
     if tool_select == '细胞骨架提取':
         pick_skeleton()
+
+if __name__ == '__main__':
+    main()
+    
