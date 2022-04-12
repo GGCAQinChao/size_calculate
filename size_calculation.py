@@ -264,7 +264,7 @@ def multi_image_process():
 
 def main():
     st.sidebar.header('模块选择')
-    tool_select = st.sidebar.selectbox('Tools to select:',['单一图像面积计算','多图像批量面积计算','细胞骨架提取'])
+    tool_select = st.sidebar.selectbox('Tools to select:',['单一图像面积计算','多图像批量面积计算'])
     if tool_select == '单一图像面积计算':
         size_calculation()
     elif tool_select == '多图像批量面积计算':
