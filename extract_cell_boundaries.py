@@ -10,6 +10,17 @@ import os
 from PIL import Image
 from skimage import morphology
 
+def upload_and_show():
+    st.write('图片读取后，由于不同的解码方式，可能会存在一定的色差，但是并不影响后续的计算操作，请放心使用。')
+    upload_file = st.file_uploader('Choose a file')
+    if upload_file is not None:
+        bytes_data = upload_file.getvalue()
+        ori_image = cv2.imdecode(np.frombuffer(bytes_data, np.uint8), cv2.IMREAD_COLOR)
+        st.image(ori_image,output_format='PNG')
+    else:
+        ori_image = 'NA'
+    return ori_image
+
 def pick_skeleton():
     st.header('原始图像读取')
     ori_image = upload_and_show()
