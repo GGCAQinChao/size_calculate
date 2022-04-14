@@ -22,6 +22,7 @@ def upload_and_show():
     return ori_image
 
 def pick_skeleton():
+    Image.MAX_IMAGE_PIXELS = None
     st.header('原始图像读取')
     ori_image = upload_and_show()
     if ori_image == 'NA':
