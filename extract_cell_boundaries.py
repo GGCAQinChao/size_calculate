@@ -53,12 +53,15 @@ def pick_skeleton():
                 binary[binary == 255] = 1
                 skeleton0 = morphology.skeletonize(binary)
                 skeleton_out = skeleton0.astype(np.uint8)*255
-                skeleton0_list.append(skeleton0.astype(np.uint8))
+                skeleton0_list.append(skeleton_out)
                 with col2:
                     st.subheader('skeleton-'+str(num))
                     st.image(skeleton_out,output_format='PNG')
-            skeleton_sum = sum(skeleton0_list)*int(255/((threshold_max-threshold_min)/threshold_level))
-            skeleton_sum = cv2.morphologyEx(skeleton_sum,cv2.MORPH_OPEN,element)
+            skeleton_sum = cv2.addWeighted(skeleton0_list[0],0.5,skeleton0_list[1],0.5,0)
+            weight_num = 0.5
+            for id in range(2,len(skeleton0_list)):
+                weight_num = 1/(1+weight_num)
+                skeleton_sum = cv2.addWeighted(skeleton_sum,weight_num,skeleton0_list[id],1-weight_num,0)
             st.subheader('骨架图合并')
             st.image(skeleton_sum,output_format='PNG')
 
