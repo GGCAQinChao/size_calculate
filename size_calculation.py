@@ -263,6 +263,7 @@ def multi_image_process():
                 st.image(image_detail[4])
 
 def main():
+    Image.MAX_IMAGE_PIXELS = None
     st.sidebar.header('模块选择')
     tool_select = st.sidebar.selectbox('Tools to select:',['单一图像面积计算','多图像批量面积计算'])
     if tool_select == '单一图像面积计算':
